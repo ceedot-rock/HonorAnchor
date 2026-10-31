@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HonorAnchor &mdash; recorded demo replay</title>
+<style>
+:root{
+  --bg:#0b0e13; --panel:#12161d; --panel2:#161b25; --line:#232b38;
+  --ink:#e9edf3; --muted:#98a4b6; --faint:#6b7789;
+  --blue:#5b8def; --teal:#3ec6d3; --gold:#d9a83e;
+  --allow:#35c07d; --deny:#e5534b; --rec:#7e8fb0;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scrollbar-color:#2c3546 var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;line-height:1.5}
+a{color:var(--blue)}
+.wrap{max-width:1240px;margin:0 auto;padding:0 22px 40px}
+header{padding:34px 0 10px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 20px;justify-content:space-between}
+.wordmark{font-size:clamp(30px,4.4vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.05;
+  background:linear-gradient(92deg,#f2f5fa 20%,#8fb0f5 55%,#3ec6d3 90%);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.tagline{color:var(--muted);font-size:15px;max-width:640px;margin:6px 0 0}
+.runbadge{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);
+  border-radius:999px;padding:7px 12px;background:var(--panel);white-space:nowrap}
+.runbadge b{color:var(--ink);font-weight:600}
+.honesty{margin:16px 0 0;border:1px solid #3a2f14;background:#171307;border-radius:10px;
+  padding:10px 14px;font-size:13px;color:#e8d9ac;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.honesty b{color:#f5e7bd;letter-spacing:.08em;font-size:11px}
+.honesty span+span::before{content:"\00b7";margin-right:10px;color:#8a7a4a}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:18px 0}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.stat .n{font-size:24px;font-weight:750;letter-spacing:-.01em;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat .l{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.stat .n.g{color:var(--allow)} .stat .n.r{color:var(--deny)}
+.stage{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);
+  border-radius:16px;padding:22px 24px;min-height:196px;display:grid;grid-template-columns:1.25fr .75fr;gap:24px}
+.stage .kicker{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.badge{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.08em;padding:5px 11px;border-radius:999px;margin:8px 0 10px}
+.badge.ALLOW{background:rgba(53,192,125,.15);color:#4dd598;border:1px solid rgba(53,192,125,.45)}
+.badge.DENY{background:rgba(229,83,75,.14);color:#ff7a70;border:1px solid rgba(229,83,75,.45)}
+.badge.RECORDED{background:rgba(126,143,176,.14);color:#a9b7cf;border:1px solid rgba(126,143,176,.4)}
+.badge.INTRO{background:rgba(91,141,239,.14);color:#9db9f5;border:1px solid rgba(91,141,239,.4)}
+.stage h2{margin:0 0 8px;font-size:clamp(22px,3vw,30px);letter-spacing:-.015em;line-height:1.15}
+.stage .cap{color:var(--muted);font-size:15px;margin:0;max-width:56ch}
+.checkline{margin-top:14px;font-family:var(--mono);font-size:13.5px;background:#0d1117;border:1px solid var(--line);
+  border-radius:9px;padding:10px 12px;color:#cfe0ff;display:none}
+.checkline.show{display:block}
+.facts{margin:0;font-size:13px}
+.facts dt{color:var(--faint);font-size:11px;letter-spacing:.09em;text-transform:uppercase;margin-top:9px}
+.facts dt:first-child{margin-top:2px}
+.facts dd{margin:2px 0 0;color:var(--ink);word-break:break-word}
+.facts dd.mono{font-family:var(--mono);font-size:12.5px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:16px 0;padding:12px 14px;
+  background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.btn{appearance:none;border:1px solid var(--line);background:#1a2130;color:var(--ink);border-radius:9px;
+  padding:9px 14px;font:600 13.5px var(--sans);cursor:pointer;transition:background .15s,transform .05s}
+.btn:hover{background:#222b3c} .btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:#4a7de0}
+.btn:disabled{opacity:.45;cursor:default;transform:none}
+.btn:focus-visible,select:focus-visible,.trow:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.progress{flex:1 1 160px;height:8px;background:#0d1117;border:1px solid var(--line);border-radius:999px;overflow:hidden;min-width:120px}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--teal));transition:width .45s ease}
+.stepcount{font-family:var(--mono);font-size:13px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+select{background:#1a2130;color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:9px 10px;font:600 13px var(--sans);cursor:pointer}
+.grid{display:grid;grid-template-columns:7fr 5fr;gap:14px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.card h3{margin:0 0 4px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.card h3 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:1px}
+.lanes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.lane{border:1px solid var(--line);border-radius:12px;padding:14px 15px;background:var(--panel2);transition:border-color .3s,box-shadow .3s}
+.lane .who{display:flex;align-items:center;gap:10px}
+.avatar{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:16px;flex:none}
+.lane.lead .avatar{background:rgba(91,141,239,.18);color:#9db9f5;border:1px solid rgba(91,141,239,.4)}
+.lane.res .avatar{background:rgba(62,198,211,.14);color:#7fdde6;border:1px solid rgba(62,198,211,.4)}
+.lane .name{font-weight:700;font-size:15.5px;line-height:1.2}
+.lane .id{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.lane .role{font-size:12.5px;color:var(--muted);margin-top:8px}
+.lane.active{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue),0 8px 24px rgba(91,141,239,.12)}
+.lane.res.active{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal),0 8px 24px rgba(62,198,211,.12)}
+.lane.dim{opacity:.55}
+.intruder{display:none;margin-top:12px;border:1px dashed rgba(229,83,75,.6);border-radius:10px;padding:10px 12px;
+  font-size:13px;color:#ffb3ad;background:rgba(229,83,75,.07)}
+.intruder.show{display:block}
+.intruder b{color:#ff7a70}
+.gate{border-left:3px solid var(--gold)}
+.gate p{margin:6px 0 12px;color:var(--muted);font-size:13.5px}
+.meter{border:1px solid var(--line);border-radius:11px;padding:12px 13px;margin-top:10px;background:var(--panel2);transition:border-color .3s,opacity .3s}
+.meter.unissued{opacity:.45}
+.meter.blocked{border-color:var(--deny);box-shadow:0 0 0 1px var(--deny)}
+.meter .mhead{display:flex;justify-content:space-between;gap:10px;font-size:13px}
+.meter .mhead b{font-weight:650}
+.meter .fp{font-family:var(--mono);font-size:11.5px;color:var(--faint)}
+.meter .nums{display:flex;gap:14px;font-size:12.5px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums;flex-wrap:wrap}
+.meter .nums b{color:var(--ink)}
+.bar{height:9px;border-radius:999px;background:#0d1117;border:1px solid var(--line);overflow:hidden;margin-top:8px;display:flex}
+.bar .spent{background:linear-gradient(90deg,var(--blue),var(--teal));transition:width .5s ease}
+.bar .remain{background:#2a3342}
+.blocktag{display:none;margin-top:8px;font-size:12px;font-weight:700;color:#ff7a70;letter-spacing:.04em}
+.meter.blocked .blocktag{display:block}
+.tnote{margin-top:14px;border:1px dashed #31405a;border-radius:10px;padding:11px 13px;font-size:13px;color:var(--muted)}
+.tnote b{color:var(--ink)}
+.tnote q{color:#c8d3e2;quotes:"\201c" "\201d"}
+.trail{position:sticky;top:14px}
+.trail .thead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.trail .thead .count{font-family:var(--mono);font-size:12px;color:var(--muted)}
+#trailList{list-style:none;margin:12px 0 0;padding:0;max-height:660px;overflow:auto}
+.trow{display:grid;grid-template-columns:30px 74px 1fr;gap:9px;align-items:baseline;width:100%;text-align:left;
+  background:none;border:none;border-left:3px solid var(--rec);border-radius:0 8px 8px 0;color:var(--ink);
+  padding:9px 10px 9px 12px;cursor:pointer;font:400 13px var(--sans);margin:0 0 4px}
+.trow:hover{background:#1a2130}
+.trow.current{background:#1a2334;border-left-color:var(--blue)}
+.trow.ALLOW{border-left-color:var(--allow)} .trow.DENY{border-left-color:var(--deny)}
+.trow .seq{font-family:var(--mono);font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+.trow .vb{font-size:10.5px;font-weight:750;letter-spacing:.07em}
+.trow .vb.ALLOW{color:#4dd598} .trow .vb.DENY{color:#ff7a70} .trow .vb.RECORDED{color:#a9b7cf}
+.trow .act{font-family:var(--mono);font-size:12.5px;word-break:break-all}
+.trow .meta{grid-column:2/4;font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:2px}
+.trow .vmark{color:var(--allow);font-weight:700}
+.verify{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+.verify .vstatus{font-size:13.5px;color:var(--muted);min-height:20px}
+.verify .vstatus.done{color:#4dd598;font-weight:600}
+.verify .vmeta{font-family:var(--mono);font-size:11.5px;color:var(--faint);word-break:break-all;margin-top:8px;line-height:1.7}
+footer{margin-top:22px;border:1px solid var(--line);border-radius:14px;padding:18px 20px;background:var(--panel)}
+footer h3{margin:0 0 8px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+footer ul{margin:0;padding-left:18px;color:var(--muted);font-size:13.5px}
+footer li{margin:5px 0}
+footer li b{color:var(--ink);font-weight:600}
+footer .keys{font-family:var(--mono);font-size:11.5px;color:var(--faint);word-break:break-all;margin-top:14px;line-height:1.8}
+footer .repro{margin-top:12px;font-size:13px;color:var(--muted)}
+footer code{font-family:var(--mono);font-size:12px;color:#c8d3e2;background:#0d1117;border:1px solid var(--line);border-radius:6px;padding:2px 6px}
+@media (max-width:980px){
+  .grid{grid-template-columns:1fr}
+  .stage{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .trail{position:static}
+  #trailList{max-height:none}
+}
+@media (max-width:560px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .lanes{grid-template-columns:1fr}
+  .wrap{padding:0 14px 32px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important;animation:none !important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <div class="wordmark">HonorAnchor</div>
+    <p class="tagline">Two agents. One job. Every spend checked before it executes &mdash; and receipted after.
+      This page replays one recorded run, receipt by receipt. Nothing here runs live.</p>
+  </div>
+  <div class="runbadge">recorded run <b>run-2026-10-31T103002Z</b><br>Mozaik v4 &middot; TypeScript</div>
+</header>
+
+<div class="honesty" role="note"><b>RECORDED REPLAY</b>
+  <span>Simulated cents &mdash; no real money</span>
+  <span>Scripted inference</span>
+  <span>No live Agent-Rider rail</span>
+  <span>No x402 / on-chain payment</span>
+  <span>Zero API keys</span>
+  <span>Fresh ephemeral keys, nothing stored</span>
+</div>
+
+<section class="stats" aria-label="Run totals">
+  <div class="stat"><div class="n" id="stReceipts">17</div><div class="l">Receipts in trail</div></div>
+  <div class="stat"><div class="n">8</div><div class="l">Gate decisions</div></div>
+  <div class="stat"><div class="n g">4</div><div class="l">ALLOW</div></div>
+  <div class="stat"><div class="n r">4</div><div class="l">DENY</div></div>
+  <div class="stat"><div class="n">52c</div><div class="l">Allowed spend, total</div></div>
+  <div class="stat"><div class="n">0c</div><div class="l">Booked without ALLOW</div></div>
+</section>
+
+<section class="stage" aria-live="polite">
+  <div>
+    <div class="kicker" id="stageKicker">Receipt 0 of 17 &middot; ready</div>
+    <span class="badge INTRO" id="stageBadge">INTRO</span>
+    <h2 id="stageTitle">Press play. Watch the gate work.</h2>
+    <p class="cap" id="stageCap">Seventeen receipts, recorded in order. The mandate gate sits between every
+      agent and every spend: it checks cumulative spend against the cap before anything executes, and writes
+      a signed receipt either way.</p>
+    <div class="checkline" id="stageCheck"></div>
+  </div>
+  <dl class="facts" id="stageFacts"></dl>
+</section>
+
+<div class="controls">
+  <button class="btn" id="btnRestart" type="button" title="Restart (R)">Restart</button>
+  <button class="btn" id="btnBack" type="button" title="Step back (left arrow)">&larr; Step</button>
+  <button class="btn primary" id="btnPlay" type="button" title="Play / pause (space)">Play</button>
+  <button class="btn" id="btnFwd" type="button" title="Step forward (right arrow)">Step &rarr;</button>
+  <label class="stepcount" for="speedSel">Speed</label>
+  <select id="speedSel" aria-label="Replay speed">
+    <option value="0.5">0.5&times;</option>
+    <option value="1" selected>1&times;</option>
+    <option value="2">2&times;</option>
+  </select>
+  <div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+  <span class="stepcount" id="stepCount">0 / 17</span>
+</div>
+
+<main class="grid">
+  <div>
+    <div class="lanes">
+      <div class="lane lead" id="laneLead">
+        <div class="who"><div class="avatar">L</div>
+          <div><div class="name">Crew Lead</div><div class="id">crew-lead</div></div></div>
+        <p class="role">Coordinates, hires, holds the 100c root mandate. Spends under the gate like everyone else.</p>
+      </div>
+      <div class="lane res" id="laneRes">
+        <div class="who"><div class="avatar">R</div>
+          <div><div class="name">Crew Researcher</div><div class="id">crew-researcher</div></div></div>
+        <p class="role">Fetches prices, performs simulated paid lookups &mdash; only under a Warrant-shaped mandate.</p>
+      </div>
+    </div>
+    <div class="intruder" id="intruderBox"><b>anonymous-seat</b> is not a crew member and holds no signing key.
+      The warrant names <b>crew-researcher</b> &mdash; the gate refuses the spend and receipts the refusal.</div>
+
+    <section class="card gate">
+      <h3><span class="dot" style="background:var(--gold)"></span>Cumulative mandate gate</h3>
+      <p>Every <b style="color:var(--ink)">pay_for_research</b> call is intercepted twice: a non-booking preview
+        before the call, and the booking gate inside the tool before any simulated execution. Denied spends are
+        never booked &mdash; the ledger only moves on ALLOW.</p>
+      <div id="meters"></div>
+      <div class="tnote"><b>Also recorded in this run&rsquo;s transcript</b> (no receipt &mdash; the claim never entered the trail):
+        a scripted answer claimed <q>Payment of 99 cents completed and settled.</q> The model-message handler
+        blocked it, because no ALLOW receipt existed for it, and the loop was corrected to state that no payment
+        was made. Only a gate ALLOW receipt in the trail proves a spend.</div>
+    </section>
+  </div>
+
+  <section class="card trail">
+    <div class="thead"><h3><span class="dot" style="background:var(--teal)"></span>Signed receipt trail</h3>
+      <span class="count" id="trailCount">0 / 17 shown</span></div>
+    <ol id="trailList"></ol>
+    <div class="verify">
+      <button class="btn" id="btnVerify" type="button">Verify trail (replay)</button>
+      <div class="vstatus" id="verifyStatus">Recorded verification not yet replayed.</div>
+      <div class="vmeta" id="verifyMeta"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <h3>What this is &mdash; and what it is not</h3>
+  <ul>
+    <li><b>Recorded replay, not a live run.</b> Every number on this page comes from the recorded run
+      <b>run-2026-10-31T103002Z</b> (17 receipts, issued 2026-10-31T10:30:02Z&ndash;10:30:03Z). No scenarios,
+      amounts, or outcomes were added.</li>
+    <li><b>Simulated cents.</b> No real money moved. The recorded run reports <b>payment_status: simulated-only</b>
+      and &ldquo;No real payment was made in this run.&rdquo; Denied spends were never booked.</li>
+    <li><b>Scripted inference.</b> The provider is recorded as &ldquo;scripted (deterministic, no model)&rdquo;.
+      No model was called and no API keys were used.</li>
+    <li><b>Receipts prove signature + canonical integrity only.</b> The trail is a TypeScript reimplementation of
+      CuNi-shaped check envelopes. It is <b>not</b> the verified Python cuni_envelope, and no CuNi-equivalence
+      claim is made.</li>
+    <li><b>No live systems.</b> No live Agent-Rider rail, no MCP calls, no x402 / on-chain payment, no Zetaris.</li>
+    <li><b>Fresh ephemeral keys.</b> Ed25519 key pairs were generated in memory at runtime; only the issuer
+      public key below was stored. Nothing else was stored.</li>
+    <li><b>No compression claims</b> are made anywhere on this page.</li>
+  </ul>
+  <div class="keys" id="keyBlock"></div>
+  <p class="repro">Reproduce the run: <code>npm install</code> &middot; <code>npm test</code> (18/18) &middot;
+    <code>npm run demo</code> (17/17 receipts verified) &middot; <code>npm run verify</code> checks any recorded
+    trail offline with the issuer public key only.</p>
+</footer>
+</div>
+
+<script type="application/json" id="trail-data">{"meta":{"title":"HonorAnchor","run_id":"run-2026-10-31T103002Z","audit_id":"accountable-crew-mozaik/run-2026-10-31T103002Z","issuer_pubkey":"3fe086a4f35bdc79aa6eb58989013aa7e05c4d90a720d848d622afbe99b38408","trail_sha256":"c88ad9288e022c9263df0fb3b829da417bd02b9ad2a5d29aef9c5cef47518122","trail_lines":17,"issued_range":"2026-10-31T10:30:02Z – 2026-10-31T10:30:03Z","receipts":17,"decisions":8,"allow":4,"deny":4,"allowed_total_cents":52,"denied_attempts":4,"denied_attempted_cents":79,"recorded":9},"steps":[{"seq":1,"action":"run.started","verdict":"RECORDED","lane":"system","title":"Run started","caption":"The operator posts the job. Two agents, one job, every spend gated.","facts":[{"label":"job","value":"Find the simulated price of a research lookup and prove the crew can pay for it under a Warrant-shaped mandate (simulated cents, no real payment)."},{"label":"lead","value":"crew-lead"},{"label":"researcher","value":"crew-researcher"},{"label":"provider","value":"scripted (deterministic, no model)"},{"label":"issued","value":"2026-10-31T10:30:02Z"}],"fig":"job posted","check":null,"fp":null,"seal":"16767c7715ba96e7","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":false,"spent":0,"remaining":null},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":false,"spent":0,"remaining":null},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":false,"spent":0,"remaining":null},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":false,"spent":0,"remaining":null}]},{"seq":2,"action":"mandate.issued","verdict":"RECORDED","lane":"lead","title":"Root mandate issued","caption":"The Lead holds the root mandate. Delegation may only narrow it.","facts":[{"label":"holder","value":"crew-lead"},{"label":"cap","value":"100c"},{"label":"fingerprint","value":"9e6fbf62e3db31e4"},{"label":"issued","value":"2026-10-31T10:30:02Z"}],"fig":"cap 100c","check":null,"fp":"9e6fbf62e3db31e4","seal":"fcf2f0e0641fbdca","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":true,"spent":0,"remaining":100},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":false,"spent":0,"remaining":null},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":false,"spent":0,"remaining":null},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":false,"spent":0,"remaining":null}]},{"seq":3,"action":"mandate.delegated","verdict":"RECORDED","lane":"both","title":"Mandate delegated — narrowed","caption":"The Lead delegates a 40c hop to the Researcher. Attenuation narrows only.","facts":[{"label":"from","value":"crew-lead"},{"label":"to","value":"crew-researcher"},{"label":"cap","value":"40c"},{"label":"fingerprint","value":"2c822482ab7570ed"},{"label":"issued","value":"2026-10-31T10:30:02Z"}],"fig":"hop cap 40c","check":null,"fp":"2c822482ab7570ed","seal":"a6aa83741b6574d8","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":true,"spent":0,"remaining":100},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":true,"spent":0,"remaining":40},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":false,"spent":0,"remaining":null},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":false,"spent":0,"remaining":null}]},{"seq":4,"action":"hire.posted","verdict":"RECORDED","lane":"lead","title":"Hire posted","caption":"The Lead posts the lookup task with a 5c simulated reward.","facts":[{"label":"task","value":"task-demo-1"},{"label":"reward","value":"5c (simulated)"},{"label":"poster","value":"crew-lead"},{"label":"issued","value":"2026-10-31T10:30:02Z"}],"fig":"reward 5c","check":null,"fp":null,"seal":"cc3e168e18c62bf3","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":true,"spent":0,"remaining":100},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":true,"spent":0,"remaining":40},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":false,"spent":0,"remaining":null},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":false,"spent":0,"remaining":null}]},{"seq":5,"action":"hire.claimed","verdict":"RECORDED","lane":"researcher","title":"Hire claimed","caption":"The Researcher claims the task.","facts":[{"label":"task","value":"task-demo-1"},{"label":"worker","value":"crew-researcher"},{"label":"issued","value":"2026-10-31T10:30:02Z"}],"fig":"task claimed","check":null,"fp":null,"seal":"1d4d2c94442dc9c6","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":true,"spent":0,"remaining":100},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":true,"spent":0,"remaining":40},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":false,"spent":0,"remaining":null},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":false,"spent":0,"remaining":null}]},{"seq":6,"action":"price.fetched","verdict":"RECORDED","lane":"researcher","title":"Price fetched","caption":"fetch_price is ungated: it only reads the simulated price. No spend yet.","facts":[{"label":"resource","value":"pcc-info"},{"label":"price","value":"2c"},{"label":"simulated","value":"true"},{"label":"issued","value":"2026-10-31T10:30:03Z"}],"fig":"price 2c","check":null,"fp":null,"seal":"7ea067cb8e2a14b3","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":true,"spent":0,"remaining":100},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":true,"spent":0,"remaining":40},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":false,"spent":0,"remaining":null},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":false,"spent":0,"remaining":null}]},{"seq":7,"action":"gate.decision","verdict":"ALLOW","lane":"researcher","title":"Gate: ALLOW — 2c","caption":"The gate checks cumulative spend BEFORE execution. ALLOW receipt written; the spend settles simulated.","facts":[{"label":"caller","value":"crew-researcher"},{"label":"cost","value":"2c"},{"label":"cumulative spent","value":"2c"},{"label":"remaining","value":"38c"},{"label":"fingerprint","value":"2c822482ab7570ed"},{"label":"issued","value":"2026-10-31T10:30:03Z"}],"fig":"cost 2c · cum 2c","check":"0c spent + 2c = 2c ≤ 40c cap → ALLOW","fp":"2c822482ab7570ed","seal":"31824c5ef89c6bd2","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":true,"spent":0,"remaining":100},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":true,"spent":2,"remaining":38},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":false,"spent":0,"remaining":null},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":false,"spent":0,"remaining":null}]},{"seq":8,"action":"result.delivered","verdict":"RECORDED","lane":"researcher","title":"Result delivered","caption":"The result is delivered against the ALLOW receipt.","facts":[{"label":"task","value":"task-demo-1"},{"label":"result","value":"Simulated price: 2 cents, paid under mandate (simulated)."},{"label":"issued","value":"2026-10-31T10:30:03Z"}],"fig":"delivered","check":null,"fp":null,"seal":"6d834e7ed3e13304","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":true,"spent":0,"remaining":100},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":true,"spent":2,"remaining":38},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":false,"spent":0,"remaining":null},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":false,"spent":0,"remaining":null}]},{"seq":9,"action":"gate.decision","verdict":"DENY","lane":"researcher","title":"Gate: DENY — 50c over cap","caption":"The 50c attempt exceeds the 40c hop cap. Nothing was booked or executed.","facts":[{"label":"caller","value":"crew-researcher"},{"label":"cost","value":"50c"},{"label":"cumulative spent","value":"2c"},{"label":"deny code","value":"OVER_BUDGET"},{"label":"detail","value":"cost 50c exceeds warrant cap 40c"},{"label":"denied at","value":"function_call-interception (preview)"},{"label":"fingerprint","value":"2c822482ab7570ed"},{"label":"issued","value":"2026-10-31T10:30:03Z"}],"fig":"cost 50c · cum 2c","check":"2c spent + 50c = 52c > 40c cap → DENY · 0c booked","fp":"2c822482ab7570ed","seal":"239ca2c2be1b5b26","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":true,"spent":0,"remaining":100},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":true,"spent":2,"remaining":38},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":false,"spent":0,"remaining":null},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":false,"spent":0,"remaining":null}],"checkCost":50},{"seq":10,"action":"gate.decision","verdict":"ALLOW","lane":"researcher","title":"Gate: ALLOW — 25c","caption":"A fresh 40c mandate: 25c fits.","facts":[{"label":"caller","value":"crew-researcher"},{"label":"cost","value":"25c"},{"label":"cumulative spent","value":"25c"},{"label":"remaining","value":"15c"},{"label":"fingerprint","value":"0d7b8a6a657b215c"},{"label":"issued","value":"2026-10-31T10:30:03Z"}],"fig":"cost 25c · cum 25c","check":"0c spent + 25c = 25c ≤ 40c cap → ALLOW","fp":"0d7b8a6a657b215c","seal":"92d4e5a11f82e88f","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":true,"spent":0,"remaining":100},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":true,"spent":2,"remaining":38},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":true,"spent":25,"remaining":15},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":false,"spent":0,"remaining":null}]},{"seq":11,"action":"gate.decision","verdict":"DENY","lane":"researcher","title":"Gate: DENY — cumulative over cap","caption":"The same 25c, a second time: the gate counts cumulatively. 25c spent + 25c exceeds the 40c cap.","facts":[{"label":"caller","value":"crew-researcher"},{"label":"cost","value":"25c"},{"label":"cumulative spent","value":"25c"},{"label":"deny code","value":"OVER_BUDGET"},{"label":"detail","value":"cumulative spend 25c + cost 25c exceeds warrant cap 40c"},{"label":"denied at","value":"function_call-interception (preview)"},{"label":"fingerprint","value":"0d7b8a6a657b215c"},{"label":"issued","value":"2026-10-31T10:30:03Z"}],"fig":"cost 25c · cum 25c","check":"25c spent + 25c = 50c > 40c cap → DENY · 0c booked","fp":"0d7b8a6a657b215c","seal":"b345fdb58e496566","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":true,"spent":0,"remaining":100},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":true,"spent":2,"remaining":38},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":true,"spent":25,"remaining":15},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":false,"spent":0,"remaining":null}],"checkCost":25},{"seq":12,"action":"tamper.refused","verdict":"RECORDED","lane":"system","title":"Tamper refused","caption":"Widening a mandate throws WarrantError. The trail records the refusal.","facts":[{"label":"detail","value":"delegate() widening 40c -> 90c threw WarrantError warrant_widen_cents"},{"label":"fingerprint","value":"2c822482ab7570ed"},{"label":"issued","value":"2026-10-31T10:30:03Z"}],"fig":"widening refused","check":null,"fp":"2c822482ab7570ed","seal":"a0d2b3e14043de47","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":true,"spent":0,"remaining":100},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":true,"spent":2,"remaining":38},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":true,"spent":25,"remaining":15},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":false,"spent":0,"remaining":null}]},{"seq":13,"action":"gate.decision","verdict":"DENY","lane":"researcher","title":"Gate: DENY — tampered warrant","caption":"The widened warrant fingerprint does not verify. DENY.","facts":[{"label":"caller","value":"crew-researcher"},{"label":"cost","value":"2c"},{"label":"cumulative spent","value":"0c"},{"label":"deny code","value":"WARRANT_DENIED"},{"label":"detail","value":"warrant_widen_cents"},{"label":"denied at","value":"function_call-interception (preview)"},{"label":"fingerprint","value":"7398199c7aac0fb3"},{"label":"issued","value":"2026-10-31T10:30:03Z"}],"fig":"cost 2c · cum 0c","check":"warrant fingerprint fails verification → DENY · 0c booked","fp":"7398199c7aac0fb3","seal":"8932b0bf0f9c81a3","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":true,"spent":0,"remaining":100},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":true,"spent":2,"remaining":38},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":true,"spent":25,"remaining":15},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":false,"spent":0,"remaining":null}],"checkCost":2},{"seq":14,"action":"gate.decision","verdict":"DENY","lane":"intruder","title":"Gate: DENY — anonymous seat","caption":"The warrant names crew-researcher. An unsigned anonymous seat is refused.","facts":[{"label":"caller","value":"anonymous-seat"},{"label":"cost","value":"2c"},{"label":"cumulative spent","value":"2c"},{"label":"deny code","value":"AGENT_MISMATCH"},{"label":"detail","value":"warrant names \"crew-researcher\", caller is \"anonymous-seat\""},{"label":"denied at","value":"function_call-interception (preview)"},{"label":"fingerprint","value":"2c822482ab7570ed"},{"label":"issued","value":"2026-10-31T10:30:03Z"}],"fig":"cost 2c · cum 2c","check":"caller ≠ warrant holder → DENY · 0c booked","fp":"2c822482ab7570ed","seal":"061b03b269d77efc","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":true,"spent":0,"remaining":100},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":true,"spent":2,"remaining":38},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":true,"spent":25,"remaining":15},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":false,"spent":0,"remaining":null}],"checkCost":2},{"seq":15,"action":"gate.decision","verdict":"ALLOW","lane":"both","title":"Gate: ALLOW — Lead 10c (concurrent)","caption":"Lead spends under the root mandate — dispatched the same millisecond as the Researcher spend.","facts":[{"label":"caller","value":"crew-lead"},{"label":"cost","value":"10c"},{"label":"cumulative spent","value":"10c"},{"label":"remaining","value":"90c"},{"label":"fingerprint","value":"9e6fbf62e3db31e4"},{"label":"issued","value":"2026-10-31T10:30:03Z"}],"fig":"cost 10c · cum 10c","check":"0c spent + 10c = 10c ≤ 100c cap → ALLOW","fp":"9e6fbf62e3db31e4","seal":"32ba2a54b0d2b3de","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":true,"spent":10,"remaining":90},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":true,"spent":2,"remaining":38},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":true,"spent":25,"remaining":15},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":false,"spent":0,"remaining":null}]},{"seq":16,"action":"gate.decision","verdict":"ALLOW","lane":"both","title":"Gate: ALLOW — Researcher 15c (concurrent)","caption":"Researcher spends under its own mandate — both loops ran concurrently, 2 distinct loopIds.","facts":[{"label":"caller","value":"crew-researcher"},{"label":"cost","value":"15c"},{"label":"cumulative spent","value":"15c"},{"label":"remaining","value":"45c"},{"label":"fingerprint","value":"e50c03d5e55e23ae"},{"label":"issued","value":"2026-10-31T10:30:03Z"}],"fig":"cost 15c · cum 15c","check":"0c spent + 15c = 15c ≤ Nonec cap → ALLOW","fp":"e50c03d5e55e23ae","seal":"d4ee4bb7e87d0285","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":true,"spent":10,"remaining":90},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":true,"spent":2,"remaining":38},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":true,"spent":25,"remaining":15},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":true,"spent":15,"remaining":45}]},{"seq":17,"action":"run.finished","verdict":"RECORDED","lane":"system","title":"Run finished","caption":"No real payment was made in this run.","facts":[{"label":"payment_status","value":"simulated-only"},{"label":"note","value":"No real payment was made in this run."},{"label":"issued","value":"2026-10-31T10:30:03Z"}],"fig":"simulated-only","check":null,"fp":null,"seal":"1b77f4d46c11048f","meters":[{"fp":"9e6fbf62e3db31e4","label":"Root mandate","holder":"crew-lead","cap":100,"issued":true,"spent":10,"remaining":90},{"fp":"2c822482ab7570ed","label":"Delegated hop","holder":"crew-researcher","cap":40,"issued":true,"spent":2,"remaining":38},{"fp":"0d7b8a6a657b215c","label":"Fresh hop","holder":"crew-researcher","cap":40,"issued":true,"spent":25,"remaining":15},{"fp":"e50c03d5e55e23ae","label":"Concurrent spend","holder":"crew-researcher","cap":null,"issued":true,"spent":15,"remaining":45}]}]}</script>
+<script>
+(function(){
+"use strict";
+var DATA = JSON.parse(document.getElementById("trail-data").textContent);
+var STEPS = DATA.steps, META = DATA.meta;
+var BASE_MS = 3500;
+var idx = 0, playing = false, timer = null, speed = 1;
+var verifying = false, verifyTimer = null, verifiedUpTo = 0;
+
+var el = function(id){ return document.getElementById(id); };
+var stageKicker = el("stageKicker"), stageBadge = el("stageBadge"),
+    stageTitle = el("stageTitle"), stageCap = el("stageCap"),
+    stageCheck = el("stageCheck"), stageFacts = el("stageFacts"),
+    progressBar = el("progressBar"), stepCount = el("stepCount"),
+    trailList = el("trailList"), trailCount = el("trailCount"),
+    metersBox = el("meters"), laneLead = el("laneLead"), laneRes = el("laneRes"),
+    intruderBox = el("intruderBox"), btnPlay = el("btnPlay"),
+    verifyStatus = el("verifyStatus"), verifyMeta = el("verifyMeta");
+
+function esc(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function fmtFacts(facts){
+  var h = "";
+  facts.forEach(function(f){
+    var mono = /fingerprint|issued|caller|holder|from|to|worker|poster|payment_status/.test(f.label);
+    h += "<dt>" + esc(f.label) + "</dt><dd" + (mono ? " class=\"mono\"" : "") + ">" + esc(f.value) + "</dd>";
+  });
+  return h;
+}
+function meterHTML(m, blockedFp, blockedCost){
+  var blocked = blockedFp && m.fp === blockedFp;
+  var cls = "meter" + (m.issued ? "" : " unissued") + (blocked ? " blocked" : "");
+  var capTxt = m.cap === null ? "cap not stated in artifacts" : ("cap " + m.cap + "c");
+  var spent = m.issued ? m.spent : 0;
+  var rem = m.issued ? m.remaining : null;
+  var total = m.cap !== null ? m.cap : (m.issued ? (m.spent + m.remaining) : 1);
+  var spentPct = total > 0 ? Math.round(100 * spent / total) : 0;
+  var nums;
+  if(!m.issued){
+    nums = "<span>not yet issued</span>";
+  } else {
+    nums = "<span>spent <b>" + spent + "c</b></span><span>remaining <b>" + rem + "c</b></span><span>" + capTxt + "</span>";
+  }
+  return "<div class=\"" + cls + "\">" +
+    "<div class=\"mhead\"><b>" + esc(m.label) + "</b><span class=\"fp\">" + esc(m.fp) + " &middot; " + esc(m.holder) + "</span></div>" +
+    "<div class=\"nums\">" + nums + "</div>" +
+    "<div class=\"bar\"><div class=\"spent\" style=\"width:" + spentPct + "%\"></div><div class=\"remain\" style=\"flex:1\"></div></div>" +
+    (blocked ? "<div class=\"blocktag\">BLOCKED " + blockedCost + "c &mdash; 0c booked</div>" : "") +
+    "</div>";
+}
+function renderMeters(){
+  var state = idx === 0 ? STEPS[0].meters.map(function(m){
+    return {fp:m.fp,label:m.label,holder:m.holder,cap:m.cap,issued:false,spent:0,remaining:null};
+  }) : STEPS[idx-1].meters;
+  var cur = idx > 0 ? STEPS[idx-1] : null;
+  var blockedFp = null, blockedCost = null;
+  if(cur && cur.verdict === "DENY"){ blockedFp = cur.fp; blockedCost = cur.checkCost; }
+  var h = "";
+  state.forEach(function(m){ h += meterHTML(m, blockedFp, blockedCost); });
+  metersBox.innerHTML = h;
+}
+function renderTrail(){
+  var h = "";
+  for(var i = 0; i < idx; i++){
+    var s = STEPS[i];
+    var vmark = (verifying || verifiedUpTo > i) && i < verifiedUpTo ? " <span class=\"vmark\">&#10003;</span>" : "";
+    h += "<li><button type=\"button\" class=\"trow " + s.verdict + (i === idx-1 ? " current" : "") + "\" data-seq=\"" + s.seq + "\">" +
+      "<span class=\"seq\">" + String(s.seq).padStart(2,"0") + "</span>" +
+      "<span class=\"vb " + s.verdict + "\">" + s.verdict + "</span>" +
+      "<span class=\"act\">" + esc(s.action) + vmark + "</span>" +
+      "<span class=\"meta\">" + esc(s.fig) + " &middot; seal " + esc(s.seal) + "</span>" +
+      "</button></li>";
+  }
+  trailList.innerHTML = h;
+  trailCount.textContent = idx + " / 17 shown";
+  var rows = trailList.querySelectorAll(".trow");
+  rows.forEach(function(row){
+    row.addEventListener("click", function(){
+      pause();
+      goTo(parseInt(row.getAttribute("data-seq"), 10));
+    });
+  });
+  var cur = trailList.querySelector(".trow.current");
+  if(cur){ cur.scrollIntoView({block:"nearest", behavior:"smooth"}); }
+}
+function liveCounts(){
+  var a = 0, d = 0;
+  for(var i = 0; i < idx; i++){
+    if(STEPS[i].verdict === "ALLOW") a++;
+    if(STEPS[i].verdict === "DENY") d++;
+  }
+  return {a:a, d:d};
+}
+function render(){
+  var c = liveCounts();
+  stepCount.textContent = idx + " / 17  \u00b7  ALLOW " + c.a + "  \u00b7  DENY " + c.d;
+  progressBar.style.width = (100 * idx / 17) + "%";
+  if(idx === 0){
+    stageKicker.textContent = "Receipt 0 of 17 \u00b7 ready";
+    stageBadge.textContent = "INTRO"; stageBadge.className = "badge INTRO";
+    stageTitle.textContent = "Press play. Watch the gate work.";
+    stageCap.textContent = "Seventeen receipts, recorded in order. The mandate gate sits between every agent and every spend: it checks cumulative spend against the cap before anything executes, and writes a signed receipt either way.";
+    stageCheck.className = "checkline"; stageCheck.textContent = "";
+    stageFacts.innerHTML = fmtFacts([
+      {label:"run", value:META.run_id},
+      {label:"audit", value:META.audit_id},
+      {label:"issued", value:META.issued_range}
+    ]);
+  } else {
+    var s = STEPS[idx-1];
+    stageKicker.textContent = "Receipt " + s.seq + " of 17 \u00b7 " + s.action;
+    stageBadge.textContent = s.verdict; stageBadge.className = "badge " + s.verdict;
+    stageTitle.textContent = s.title;
+    stageCap.textContent = s.caption;
+    if(s.check){
+      stageCheck.textContent = "gate check:  " + s.check;
+      stageCheck.className = "checkline show";
+    } else {
+      stageCheck.className = "checkline"; stageCheck.textContent = "";
+    }
+    stageFacts.innerHTML = fmtFacts(s.facts);
+  }
+  laneLead.classList.remove("active","dim");
+  laneRes.classList.remove("active","dim");
+  intruderBox.classList.remove("show");
+  if(idx > 0){
+    var lane = STEPS[idx-1].lane;
+    if(lane === "lead"){ laneLead.classList.add("active"); laneRes.classList.add("dim"); }
+    else if(lane === "researcher"){ laneRes.classList.add("active"); laneLead.classList.add("dim"); }
+    else if(lane === "both"){ laneLead.classList.add("active"); laneRes.classList.add("active"); }
+    else if(lane === "intruder"){ intruderBox.classList.add("show"); laneRes.classList.add("dim"); }
+  }
+  renderMeters();
+  renderTrail();
+  btnPlay.textContent = playing ? "Pause" : (idx >= 17 ? "Replay" : "Play");
+  el("btnBack").disabled = idx === 0;
+  el("btnFwd").disabled = idx >= 17;
+}
+function goTo(i){
+  idx = Math.max(0, Math.min(17, i));
+  stopVerify();
+  render();
+}
+function tick(){
+  if(idx >= 17){ pause(); return; }
+  idx++;
+  if(idx >= 17){ pause(); }
+  render();
+}
+function play(){
+  if(idx >= 17){ idx = 0; }
+  if(playing) return;
+  playing = true;
+  timer = setInterval(tick, BASE_MS / speed);
+  render();
+}
+function pause(){
+  playing = false;
+  if(timer){ clearInterval(timer); timer = null; }
+  render();
+}
+function stopVerify(){
+  verifying = false; verifiedUpTo = 0;
+  if(verifyTimer){ clearInterval(verifyTimer); verifyTimer = null; }
+  verifyStatus.className = "vstatus";
+  verifyStatus.textContent = "Recorded verification not yet replayed.";
+  verifyMeta.textContent = "";
+}
+function startVerify(){
+  pause();
+  stopVerify();
+  verifying = true;
+  verifyStatus.className = "vstatus";
+  verifyStatus.textContent = "Checking receipt 1 / 17\u2026";
+  var i = 0;
+  verifyTimer = setInterval(function(){
+    i++;
+    verifiedUpTo = i;
+    renderTrail();
+    if(i < 17){
+      verifyStatus.textContent = "Checking receipt " + (i+1) + " / 17\u2026";
+    } else {
+      clearInterval(verifyTimer); verifyTimer = null;
+      verifying = false;
+      verifyStatus.className = "vstatus done";
+      verifyStatus.textContent = "17/17 receipts verified \u2014 recorded offline verification for this run (issuer public key only).";
+      verifyMeta.textContent = "trail SHA-256: " + META.trail_sha256 + "  \u00b7  issuer pubkey: " + META.issuer_pubkey;
+    }
+  }, 110);
+}
+el("btnPlay").addEventListener("click", function(){ playing ? pause() : play(); });
+el("btnBack").addEventListener("click", function(){ pause(); goTo(idx-1); });
+el("btnFwd").addEventListener("click", function(){ pause(); goTo(idx+1); });
+el("btnRestart").addEventListener("click", function(){ pause(); goTo(0); });
+el("btnVerify").addEventListener("click", startVerify);
+el("speedSel").addEventListener("change", function(){
+  speed = parseFloat(this.value) || 1;
+  if(playing){ pause(); play(); }
+});
+document.addEventListener("keydown", function(e){
+  if(e.target && (e.target.tagName === "SELECT" || e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
+  if(e.code === "Space"){ e.preventDefault(); playing ? pause() : play(); }
+  else if(e.code === "ArrowRight"){ pause(); goTo(idx+1); }
+  else if(e.code === "ArrowLeft"){ pause(); goTo(idx-1); }
+  else if(e.code === "KeyR"){ pause(); goTo(0); }
+});
+el("keyBlock").innerHTML =
+  "issuer public key: " + esc(META.issuer_pubkey) + "<br>" +
+  "trail SHA-256: " + esc(META.trail_sha256) + " &middot; " + META.trail_lines + " lines &middot; audit: " + esc(META.audit_id);
+render();
+})();
+</script>
+</body>
+</html>
