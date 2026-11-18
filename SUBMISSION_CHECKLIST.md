@@ -1,7 +1,8 @@
 # Submission checklist — Novi Sad Freestyle (Corey's clicks only)
 
-Status: build verified locally. NOTHING below has been published,
-submitted, or booked. Every step in this file is Corey's own click.
+Status: SUBMITTED 2026-10-31 14:20 ET, verified on dashboard ("HonorAnchor", "In the public gallery", "SUBMITTED 31 October 2026", repo ceedot-rock/HonorAnchor, Freestyle). No confirmation/reference number shown. Resubmit allowed until close; latest entry judged. REPLACEMENT: dashboard previously showed submitted "Boxoffice" (ceedot-rock/boxoffice); one entry per team, HonorAnchor now the only project shown.
+(github.com/ceedot-rock/HonorAnchor, PUBLIC, commit 264ec8e, 22 files).
+Demo slot NOT booked: dashboard slots listed final, no slot-selection field in the submission form, none required to submit. DECISION 14:51 ET: Corey tapped "Keep HonorAnchor" — Boxoffice stays replaced, no resubmit.
 
 Deadline: submissions close **Sat Oct 31, 2026, 20:00 CET = 15:00 ET**.
 CONFIRMED 2026-10-31: the Oct 30 "We're live" email corrects the Oct 29
@@ -9,16 +10,12 @@ agenda's 18:00 CET — "Not 18:00, as yesterday's email said: you have until
 the end of the hackathon." The dashboard still governs; re-check there. Winners announced Nov 7. Prizes: $500 / $300 / $200 + 5×
 six-month Mozaik Cloud Premium.
 
-## 1. Dashboard check (do first, tonight)
+## 1. Dashboard check (done 2026-10-31 14:20 ET)
 
-- [ ] Open the hackathon dashboard: https://build.jigjoy.ai/dashboard
-      (recovered 2026-10-31 from the Oct 29 agenda email HTML; same link
-      in the Oct 30 "We're live" email).
-- [ ] Confirm: starter template / primer — is one provided, and does
-      this entry need to start from it? (Record the answer here.)
-- [ ] Confirm: the EINSTEIN / Software Factory tracks are NOT this
-      entry (Freestyle was picked). Confirm Freestyle submission fields.
-- [ ] Confirm the exact submission close time shown on the dashboard.
+- [x] Open the hackathon dashboard: https://build.jigjoy.ai/dashboard
+- [x] Confirm: no starter template/primer field; Rules text search for "template" returned nothing — none required.
+- [x] Confirm: Freestyle selected (tracks offered: Software Factory, EINSTEIN, Freestyle; no "03" numbering shown).
+- [x] Confirm the exact submission close time: 20:00 CET = 15:00 ET, dashboard + Rules s.1.
 
 ## 2. Project fields (Corey fills in)
 
@@ -52,13 +49,16 @@ six-month Mozaik Cloud Premium.
       (expect 18/18) and `npm run demo` (expect exit 0, 17/17
       receipts verified). Record the new run id here: run-2026-10-31T103002Z
       (fresh run 2026-10-31 ~06:30 ET: 18/18 tests, 17/17 receipts).
+      Re-verified after demo.html was added: run-2026-10-31T103634Z
+      (18/18, 17/17). Repo created + pushed 2026-10-31 ~06:40 ET:
+      ceedot-rock/HonorAnchor, PUBLIC, commit 264ec8e, 22 files.
 - [ ] Confirm the submitted code is the code that was just run
       (no uncommitted edits after the verification run).
 
 ## 5. Submit
 
-- [ ] Submit on the dashboard. Submission is Corey's click only.
-- [ ] Save the submission confirmation / reference here: __________
+- [x] Submit on the dashboard. Submitted 2026-10-31 14:20 ET under FINISH AND ENTER authorization (Corey's code pasted 14:17 ET). Fields: only verified facts; optional video/live/screenshots left blank (not required, Rules s.5).
+- [x] Save the submission confirmation / reference here: none shown. Dashboard shows "Submitted." + "We've got it — your project is live in the gallery" and YOUR PROJECT HonorAnchor / SUBMITTED 31 October 2026.
 
 ## Open questions for Corey (from the build)
 
@@ -70,3 +70,8 @@ six-month Mozaik Cloud Premium.
 4. Demo video: NO video requirement stated in the organizer emails (Oct 29/30);
    demos are live + optional. If the dashboard form asks for one, check then —
    demo.html can be screen-recorded.
+
+## 6. Resubmission with Boxoffice add-on — 2026-10-31 14:56 ET
+
+- Corey: Boxoffice is an add-on, not a 2nd project. Tapped "Add Boxoffice link to HonorAnchor entry" 14:55 ET.
+- Update form was NOT prefilled; values re-entered exactly from the 14:20 submission, description only changed: Boxoffice sentence appended ("Add-on (per Corey): Boxoffice — https://github.com/ceedot-rock/boxoffice — ..."). No integration claim. Dashboard verified after: HonorAnchor, public gallery, SUBMITTED 31 October 2026. No reference number. No demo slot.
